@@ -1,0 +1,14 @@
+[package]
+name = "fe2o3"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hostname = "0.4.2"
+local-ip-address = "0.6.10"
+serde = { version = "1.0.228", features = ["derive"] }
+sysinfo = "0.38.0"
+serde_json = "1.0"
+clap = { version = "4.5.56", features = ["derive"] }
+log = { version = "0.4.29", features = ["kv"] }
+env_logger = "0.11.8"
