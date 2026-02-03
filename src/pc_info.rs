@@ -1,7 +1,7 @@
 use std::{ffi::OsString, net::IpAddr};
 
 use serde::{Deserialize, Serialize};
-use sysinfo::{Process, System};
+use sysinfo::{Disks, Process, System};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PcInfo {
@@ -11,6 +11,8 @@ pub struct PcInfo {
     top_five_processes: Vec<(String, u64)>, // top 5 heavy processes running.
     ip_addr: String,
     hostname: String,
+    total_storage: u64,
+    used_storage: u64,
 }
 
 impl PcInfo {
@@ -22,6 +24,8 @@ impl PcInfo {
             top_five_processes: Vec::new(),
             ip_addr: String::new(),
             hostname: String::new(),
+            total_storage: 0,
+            used_storage: 0,
         }
     }
 
@@ -43,6 +47,19 @@ impl PcInfo {
 
         self.ip_addr = get_ip_addr();
         self.hostname = get_hostname();
+
+        let disks = Disks::new_with_refreshed_list();
+        let root_part = disks
+            .iter()
+            .find(|d| d.mount_point().to_string_lossy() == "/");
+
+        if let Some(root) = root_part {
+            self.total_storage = root.total_space();
+            self.used_storage = root.total_space() - root.available_space();
+        } else {
+            self.total_storage = 0;
+            self.used_storage = 0;
+        }
     }
 
     pub fn hostname(&self) -> &str {
